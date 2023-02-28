@@ -5,4 +5,6 @@ void iniciaServidor();
 
 void updateServidor();
 
+void handleServer(); 
+
 #endif
