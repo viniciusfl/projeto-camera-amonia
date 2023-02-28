@@ -31,8 +31,8 @@ namespace SERVIDOR {
 															//               160x120 (QQVGA), 128x160 (QQVGA2), 176x144 (QCIF), 240x176 (HQVGA),
 															//               320x240 (QVGA), 400x296 (CIF), 640x480 (VGA, default), 800x600 (SVGA),
 															//               1024x768 (XGA), 1280x1024 (SXGA), 1600x1200 (UXGA)
-	uint32_t altura = 640;
-	uint32_t largura = 480;
+	uint32_t largura = 640;
+	uint32_t altura = 480;
 	
 	#define PIXFORMAT PIXFORMAT_JPEG;                    // image format, Options =  YUV422, GRAYSCALE, RGB565, JPEG, RGB888
 
@@ -253,7 +253,7 @@ void handleRoot() {
 
 	// links to the other pages available
 	client.write("<br><br>LINKS: \n");
-	client.write("<a href='/jpg'>Baixa a imagem</a> - \n");
+	client.write("<a href='/jpg'>Baixa a imagem</a> \n");
 
 	// capture and show a jpg image
 	client.write("<br><a href='/jpg'>");         // make it a link
