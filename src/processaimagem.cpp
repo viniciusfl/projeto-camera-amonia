@@ -6,12 +6,11 @@ uint32_t vetoriza(uint32_t x, uint32_t y, int largura) {
     return x + (y*largura);
 }
 
-int* vals_rgb(uint32_t ponto, uint8_t *rgb) {
-    static int vals[3];
-    vals[0] = rgb[3*ponto];
-    vals[1] = rgb[(3*ponto) + 1];
-    vals[2] = rgb[(3*ponto) + 2];
-    return vals;
+void vals_rgb(uint32_t ponto, uint8_t *rgb, int* array) {
+    array[0] = rgb[3*ponto];
+    array[1] = rgb[(3*ponto) + 1];
+    array[2] = rgb[(3*ponto) + 2];
+    return;
 }
 
 int hue(double r, double g, double b){
@@ -56,31 +55,12 @@ String mais_proximo_util(double valor, double* lista) {
     double min = INT_MAX;
     int index = 0;
 
-    Serial.print("Valor hue do centro = ");
-    Serial.println(valor);
-
-    Serial.print("Valor do hue da esquerda (0) = ");
-    Serial.println(lista[0]);
-
-    Serial.print("Valor do hue da direita (1) = ");
-    Serial.println(lista[1]);
-
-    Serial.print("Valor do hue superior (2) = ");
-    Serial.println(lista[2]);
-
-    Serial.print("Valor do hue inferior (3) = ");
-    Serial.println(lista[3]);
-
-
-
     for(int i = 0; i < 4; i++){
-        if(abs(int(valor) - int(lista[i])) < min){
-            min = int(valor) - int(lista[i]);
+        if(abs(((int) valor) - ((int) lista[i])) < min){
+            min = abs(((int) valor) - ((int) lista[i]));
             index = i;
         }
     }
-    Serial.print("Index mais próximo: ");
-    Serial.println(index);
 
     return mais_proximo_util_2(index);
 }
@@ -90,28 +70,50 @@ String mais_proximo_util(double valor, double* lista) {
 String processa_imagem(uint8_t *rgb, int altura, int largura) {
     uint32_t ponto_esquerdo_x = (uint32_t)(1 / 4. * largura);
     uint32_t ponto_esquerdo_y = (uint32_t)(1 / 2. * altura);
-    Serial.print("Coordenadas ponto esquerdo: ");
-    Serial.println(ponto_esquerdo_x, ponto_esquerdo_y);
+
 
     uint32_t ponto_direito_x = (uint32_t)(3 / 4. * largura);
     uint32_t ponto_direito_y = (uint32_t)(1 / 2. * altura);
-    Serial.print("Coordenadas ponto direito: ");
-    Serial.println(ponto_direito_x, ponto_direito_y);
+
 
     uint32_t ponto_superior_x = (uint32_t)(1 / 2. * largura);
     uint32_t ponto_superior_y = (uint32_t)(1 / 4. * altura);
-    Serial.print("Coordenadas ponto superior: ");
-    Serial.println(ponto_superior_x, ponto_superior_y);
+    
 
     uint32_t ponto_inferior_x = (uint32_t)(1 / 2. * largura);
     uint32_t ponto_inferior_y = (uint32_t)(3 / 4. * altura);
-    Serial.print("Coordenadas ponto inferior: ");
-    Serial.println(ponto_inferior_x, ponto_inferior_y);
+    
 
     uint32_t ponto_central_x = (uint32_t)(1 / 2. * largura);
     uint32_t ponto_central_y = (uint32_t)(1 / 2. * altura);
+
+/*
+    Serial.print("Coordenadas ponto esquerdo: ");
+    Serial.print("(");
+    Serial.print(ponto_esquerdo_x); Serial.print(","); Serial.print(ponto_esquerdo_y); 
+    Serial.println(")");
+
+    Serial.print("Coordenadas ponto direito: ");
+    Serial.print("(");
+    Serial.print(ponto_direito_x); Serial.print(","); Serial.print(ponto_direito_y); 
+    Serial.println(")");
+    
+    Serial.print("Coordenadas ponto superior: ");
+    Serial.print("(");
+    Serial.print(ponto_superior_x); Serial.print(","); Serial.print(ponto_superior_y); 
+    Serial.println(")");
+
+    Serial.print("Coordenadas ponto inferior: ");
+    Serial.print("(");
+    Serial.print(ponto_inferior_x); Serial.print(","); Serial.print(ponto_inferior_y); 
+    Serial.println(")");
+
     Serial.print("Coordenadas ponto central: ");
-    Serial.println(ponto_central_x, ponto_central_y);
+    Serial.print("(");
+    Serial.print(ponto_central_x); Serial.print(","); Serial.print(ponto_central_y); 
+    Serial.println(")");
+
+*/    
 
     uint32_t ponto_esquerdo_vetorizado = vetoriza(ponto_esquerdo_x, ponto_esquerdo_y, largura);
     uint32_t ponto_direito_vetorizado = vetoriza(ponto_direito_x, ponto_direito_y, largura);
@@ -119,12 +121,39 @@ String processa_imagem(uint8_t *rgb, int altura, int largura) {
     uint32_t ponto_inferior_vetorizado = vetoriza(ponto_inferior_x, ponto_inferior_y, largura);
     uint32_t ponto_central_vetorizado = vetoriza(ponto_central_x, ponto_central_y, largura);
 
-    int* esquerdo = vals_rgb(ponto_esquerdo_vetorizado, rgb);
-    int* direito = vals_rgb(ponto_esquerdo_vetorizado, rgb);
-    int* superior = vals_rgb(ponto_esquerdo_vetorizado, rgb);
-    int* inferior = vals_rgb(ponto_esquerdo_vetorizado, rgb);
-    int* centro = vals_rgb(ponto_central_vetorizado, rgb);
+/*
+    Serial.print("esquerdo vetorizado = ");
+    Serial.println(ponto_esquerdo_vetorizado);
 
+    Serial.print("direito vetorizado = ");
+    Serial.println(ponto_direito_vetorizado);
+
+    Serial.print("superior vetorizado = ");
+    Serial.println(ponto_superior_vetorizado);
+
+    Serial.print("inferior vetorizado = ");
+    Serial.println(ponto_inferior_vetorizado);
+
+    Serial.print("central vetorizado = ");
+    Serial.println(ponto_central_vetorizado);
+*/
+
+    int esquerdo[3];
+    vals_rgb(ponto_esquerdo_vetorizado, rgb, esquerdo);
+    
+    int direito[3];
+    vals_rgb(ponto_direito_vetorizado, rgb, direito);
+    
+    int superior[3];
+    vals_rgb(ponto_superior_vetorizado, rgb, superior);
+    
+    int inferior[3];
+    vals_rgb(ponto_inferior_vetorizado, rgb, inferior);
+    
+    int centro[3];
+    vals_rgb(ponto_central_vetorizado, rgb, centro);
+
+    
     double hues[4];
     hues[0] = hue(esquerdo[0], esquerdo[1], esquerdo[2]);
     hues[1] = hue(direito[0], direito[1], direito[2]);
