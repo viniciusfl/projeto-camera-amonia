@@ -100,7 +100,7 @@ namespace SERVIDOR {
 		client.write("Content-Type: text/html\r\n");
 		client.write("Connection: close\r\n");
 		client.write("\r\n");
-		client.write("<!DOCTYPE HTML><html lang='en'>\n");
+		client.write("<!DOCTYPE HTML><html lang='en'><meta charset='utf-8'>\n");
 		// HTML / CSS
 		client.printf(R"=====(
 			<head>
@@ -195,7 +195,6 @@ namespace SERVIDOR {
 		client.write(CTNTTYPE, cntLen);
 		sprintf( buf, "%d\r\n\r\n", fb->len);      // put text size in to 'buf' char array and send
 		client.write(buf, strlen(buf));
-
 		// send the captured jpg data
 		client.write((char *)fb->buf, fb->len);
 
@@ -210,7 +209,6 @@ namespace SERVIDOR {
 			sendText(client,"error: not enough free psram to store the rgb data");
 			return 0;
 		}
-		
 		ptrVal = heap_caps_malloc(ARRAY_LENGTH, MALLOC_CAP_SPIRAM);                                          // allocate memory space for the rgb data
 		uint8_t *rgb = (uint8_t *)ptrVal;                                                                    // create the 'rgb' array pointer to the allocated memory space
 		sendText(client,"Free psram after rgb data allocated = " + String(heap_caps_get_free_size(MALLOC_CAP_SPIRAM) / 1024) + "K");
@@ -277,8 +275,6 @@ void handleRoot() {
 		setInterval(function() { refreshImage(); }, %d);
 		</script>
 	)=====", imagerefresh * 1013);        // 1013 is just to stop it refreshing at the same time as /data
-
-	client.println("<br><br><a href='https://github.com/alanesq/esp32cam-demo'>Sketch Info</a>");
 
 
 	// --------------------------------------------------------------------
