@@ -39,21 +39,6 @@ int hue(double r, double g, double b){
     return h;
 }
 
-
-String mais_proximo_util(double valor, double* lista) {
-    double min = INT_MAX;
-    int index = 0;
-    for(int i = 0; i < 4; i++){
-        if(abs(int(valor) - int(lista[i])) < min){
-            min = int(valor) - int(lista[i]);
-            index = i;
-        }
-    }
-
-    return mais_proximo_util_2(index);
-}
-
-
 String mais_proximo_util_2(int i){
 	if(i == 0){
         return "ALERT";
@@ -68,6 +53,21 @@ String mais_proximo_util_2(int i){
         return "ALARM";
 	}
 }
+
+
+String mais_proximo_util(double valor, double* lista) {
+    double min = INT_MAX;
+    int index = 0;
+    for(int i = 0; i < 4; i++){
+        if(abs(int(valor) - int(lista[i])) < min){
+            min = int(valor) - int(lista[i]);
+            index = i;
+        }
+    }
+
+    return mais_proximo_util_2(index);
+}
+
 
 
 String processa_imagem(uint8_t *rgb, int altura, int largura) {

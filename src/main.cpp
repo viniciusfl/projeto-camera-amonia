@@ -2,6 +2,7 @@
 #include <conexao.h>
 #include <SPI.h>
 #include <SD.h>
+#include <server.h>
 
 unsigned long millisAtual;
 
@@ -14,15 +15,13 @@ void setup() {
     millisAtual = millis();
 
     iniciaWifi();
-
+    iniciaServidor();
 }
 
 void loop() {
     millisAtual = millis();
-
+    handleServer();
     verificaConexao();
-    Serial.println("teste");
-    delay(5000);
 }
 
 
