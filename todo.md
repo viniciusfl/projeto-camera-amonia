@@ -1,4 +1,7 @@
 - Colocar horário indicando quando a foto que está sendo analisada foi tirada.
 - Tentar fazer circulo vermelho envolvendo cada pixel que está sendo analisado.
+    - Checar se de fato os pixels estão sendo modificados
+    - Converter array rgb para jpg
+    - Postar novo jpg
 - Jogar o servidor local na web.
 - Pensar e trabalhar em questões de usabilidade.
