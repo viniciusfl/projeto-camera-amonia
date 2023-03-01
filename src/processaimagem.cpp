@@ -72,9 +72,9 @@ void faz_quadrado(uint8_t *rgb, uint32_t x, uint32_t y, int k, int largura){
             if((i!=x) || (j!=y)){
                 uint32_t pos = vetoriza(i, j, largura);
                 // pinta de vermelho
-                // rgb[3*pos] = 0;        // B
-                // rgb[3*pos + 1] = 0;    // G
-                // rgb[3*pos + 2] = 255;  // R
+                rgb[3*pos] = 0;        // B
+                rgb[3*pos + 1] = 0;    // G
+                rgb[3*pos + 2] = 255;  // R
             }
         }
     }
