@@ -1,3 +1,5 @@
+- Definir pontos a serem analisados no arquivo server.cpp.
+- Fazer função processa_imagem receber lista com os pontos a serem analisados.
 - Colocar horário indicando quando a foto que está sendo analisada foi tirada.
 - Tentar fazer circulo vermelho envolvendo cada pixel que está sendo analisado.
     - Checar se de fato os pixels estão sendo modificados
