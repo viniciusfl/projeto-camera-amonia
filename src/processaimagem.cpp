@@ -65,6 +65,19 @@ String mais_proximo_util(double valor, double* lista) {
     return mais_proximo_util_2(index);
 }
 
+void faz_quadrado(uint8_t *rgb, uint32_t x, uint32_t y, int k, int largura){
+    for(int i = (x-k); i < (x+k+1); i++){
+        for(int j = (y-k); j < (y+k+1); j++){
+            if((i!=x) || (j!=y)){
+                uint32_t pos = vetoriza(i, j, largura);
+                // pinta de vermelho
+                rgb[3*pos] = 0;        // B
+                rgb[3*pos + 1] = 0;    // G
+                rgb[3*pos + 2] = 255;  // R
+            }
+        }
+    }
+}
 
 String processa_imagem(uint8_t *rgb, int altura, int largura) {
     uint32_t ponto_esquerdo_x = (uint32_t)(1 / 4. * largura);

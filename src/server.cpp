@@ -227,9 +227,11 @@ namespace SERVIDOR {
 
 		resultado = processa_imagem(rgb, altura, largura);
 
+		faz_quadrado(rgb);
+
 		// Aloca a memória para guardar o novo JPEG 
-		sendText(client,"<br>Free psram before rgb data allocated = " + String(heap_caps_get_free_size(MALLOC_CAP_SPIRAM) / 1024) + "K");
-		void *ptrVal = NULL;                                                                                 // create a pointer for memory location to store the data
+		sendText(client,"<br>Free psram before JPEG data allocated = " + String(heap_caps_get_free_size(MALLOC_CAP_SPIRAM) / 1024) + "K");
+		void **ptrVal_JPEG = NULL;                                                                                 // create a pointer for memory location to store the data
 		uint32_t ARRAY_LENGTH = fb->width * fb->height * 3;                                                  // calculate memory required to store the RGB data (i.e. number of pixels in the jpg image x 3)
 		
 		if (heap_caps_get_free_size( MALLOC_CAP_SPIRAM) <  ARRAY_LENGTH) {
