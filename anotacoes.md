@@ -121,3 +121,21 @@ Então, o procedimento será:
 
 Talvez piscar led quando formos capturar a imagem live.
 
+* Efetuar uma captura de "live image" (fb)
+* Converter para RGB (rgb)
+* Liberar memória que fb está ocupando
+* Obter valores RGB de 5 pixels específcos
+* Obter os valores de HUE desses 5 pixels
+* Comparar esses valores de HUE
+* Saber de qual o do centro  está mais próximo
+* Postar resposta no servidor web
+* Desenhar quadrados em rgb
+* Converter RGB (rgb) para JPEG buffer (novo_fb)
+* Liberar memória que rgb está ocupando
+* Postar novo_fb no servidor
+* Liberar memória que novo_fb está ocupando
+
+
+
+
+
