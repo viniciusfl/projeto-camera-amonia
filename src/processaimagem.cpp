@@ -79,8 +79,8 @@ void faz_quadrado(uint8_t *rgb, uint32_t x, uint32_t y, int k, int largura){
     }
 }
 
-String processa_imagem(uint8_t *rgb, int altura, int largura) {
-    uint32_t ponto_esquerdo_x = (uint32_t)(1 / 4. * largura);
+String processa_imagem(uint8_t *rgb, uint32_t **pontos, int altura, int largura) {
+/*  uint32_t ponto_esquerdo_x = (uint32_t)(1 / 4. * largura);
     uint32_t ponto_esquerdo_y = (uint32_t)(1 / 2. * altura);
 
 
@@ -98,7 +98,7 @@ String processa_imagem(uint8_t *rgb, int altura, int largura) {
 
     uint32_t ponto_central_x = (uint32_t)(1 / 2. * largura);
     uint32_t ponto_central_y = (uint32_t)(1 / 2. * altura);
-
+*/
 /*
     Serial.print("Coordenadas ponto esquerdo: ");
     Serial.print("(");
@@ -127,11 +127,11 @@ String processa_imagem(uint8_t *rgb, int altura, int largura) {
 
 */    
 
-    uint32_t ponto_esquerdo_vetorizado = vetoriza(ponto_esquerdo_x, ponto_esquerdo_y, largura);
-    uint32_t ponto_direito_vetorizado = vetoriza(ponto_direito_x, ponto_direito_y, largura);
-    uint32_t ponto_superior_vetorizado = vetoriza(ponto_superior_x, ponto_superior_y, largura);
-    uint32_t ponto_inferior_vetorizado = vetoriza(ponto_inferior_x, ponto_inferior_y, largura);
-    uint32_t ponto_central_vetorizado = vetoriza(ponto_central_x, ponto_central_y, largura);
+    uint32_t ponto_esquerdo_vetorizado = vetoriza(pontos[0][0], pontos[0][1], largura);
+    uint32_t ponto_direito_vetorizado = vetoriza(pontos[1][0], pontos[1][1], largura);
+    uint32_t ponto_superior_vetorizado = vetoriza(pontos[2][0], pontos[2][1], largura);
+    uint32_t ponto_inferior_vetorizado = vetoriza(pontos[3][0], pontos[3][1], largura);
+    uint32_t ponto_central_vetorizado = vetoriza(pontos[4][0], pontos[4][1], largura);
 
 /*
     Serial.print("esquerdo vetorizado = ");

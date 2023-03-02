@@ -33,6 +33,8 @@ namespace SERVIDOR {
 															//               1024x768 (XGA), 1280x1024 (SXGA), 1600x1200 (UXGA)
 	uint32_t largura = 640;
 	uint32_t altura = 480;
+
+	#define LARGURA_DESTAQUE 2;
 	
 	#define PIXFORMAT PIXFORMAT_JPEG;                    // image format, Options =  YUV422, GRAYSCALE, RGB565, JPEG, RGB888
 
@@ -223,31 +225,55 @@ namespace SERVIDOR {
 			return 0;
 		}
 		
-		esp_camera_fb_return(fb);   // camera frame buffer
+		esp_camera_fb_return(fb);   // libera a memória utilizada pelo frame buffer
 
-		resultado = processa_imagem(rgb, altura, largura);
+		/*
+		{{ponto_esquerdo_x, ponto_esquerdo_y},
+		 {ponto_direito_x, ponto_direito_y}, 
+		 {ponto_superior_x, ponto_superior_y},
+		 {ponto_inferior_x, ponto_inferior_y},
+		 {ponto_central_x , ponto_central_y}}; 
+		*/
 
-		faz_quadrado(rgb);
 
-		// Aloca a memória para guardar o novo JPEG 
-		sendText(client,"<br>Free psram before JPEG data allocated = " + String(heap_caps_get_free_size(MALLOC_CAP_SPIRAM) / 1024) + "K");
-		void **ptrVal_JPEG = NULL;                                                                                 // create a pointer for memory location to store the data
-		uint32_t ARRAY_LENGTH = fb->width * fb->height * 3;                                                  // calculate memory required to store the RGB data (i.e. number of pixels in the jpg image x 3)
-		
-		if (heap_caps_get_free_size( MALLOC_CAP_SPIRAM) <  ARRAY_LENGTH) {
-			sendText(client,"error: not enough free psram to store the rgb data");
-			return 0;
+		uint32_t pontos[5][2] = {{(uint32_t)(1 / 4. * largura), (uint32_t)(1 / 2. * altura)}, 
+								 {(uint32_t)(3 / 4. * largura), (uint32_t)(1 / 2. * altura)}, 
+								 {(uint32_t)(1 / 2. * largura), (uint32_t)(1 / 4. * altura)}, 
+								 {(uint32_t)(1 / 2. * largura), (uint32_t)(3 / 4. * altura)}, 
+								 {(uint32_t)(1 / 2. * largura), (uint32_t)(1 / 2. * altura)}};
+
+
+
+
+		resultado = processa_imagem(rgb, pontos, altura, largura);
+
+		for(int i = 0; i < 5; i++){
+			faz_quadrado(rgb, pontos[i][0], pontos[i][1], LARGURA_DESTAQUE, largura);
 		}
-		ptrVal = heap_caps_malloc(ARRAY_LENGTH, MALLOC_CAP_SPIRAM);                                          // allocate memory space for the rgb data
-		uint8_t *rgb = (uint8_t *)ptrVal;                                                                    // create the 'rgb' array pointer to the allocated memory space
-		sendText(client,"Free psram after rgb data allocated = " + String(heap_caps_get_free_size(MALLOC_CAP_SPIRAM) / 1024) + "K");
 
-	    // Converte a imagem de RGB888 para JPEG                                                                               
-		bool rgb_converted = fmt2jpg(rgb, ARRAY_LENGTH, largura, altura, PIXFORMAT_RGB888, 10, uint8_t ** out, size_t * out_len);
+	    // Converte a imagem de RGB888 para JPEG 
+		uint8_t** novo_JPEG = NULL;     // Pointer to be populated with the address of the resulting buffer.
+		size_t * novo_JPEG_BUFF_LENGTH = NULL;   // Pointer to be populated with the length of the output buffer
+		                                                                           
+		bool rgb_converted = fmt2jpg(rgb, ARRAY_LENGTH, largura, altura, PIXFORMAT_RGB888, 10, novo_JPEG, novo_JPEG_BUFF_LENGTH);
 
-		
-		
-		heap_caps_free(ptrVal);     // rgb data
+		heap_caps_free(ptrVal);     // libera memória utilizada pelo buffer rgb
+
+
+		// html to send a jpg
+		const char HEADER[] = "HTTP/1.1 200 OK\r\nAccess-Control-Allow-Origin: *\r\n";
+		const char CTNTTYPE[] = "Content-Type: image/jpeg\r\nContent-Length: ";
+		const int hdrLen = strlen(HEADER);
+		const int cntLen = strlen(CTNTTYPE);
+		client.write(HEADER, hdrLen);
+		client.write(CTNTTYPE, cntLen);
+		sprintf( buf, "%d\r\n\r\n", fb->len);      // put text size in to 'buf' char array and send
+		client.write(buf, strlen(buf));
+		// send the captured jpg data
+		client.write((char *)novo_JPEG, novo_JPEG_BUFF_LENGTH);
+
+		heap_caps_free(novo_JPEG);     // libera memória utilizada pelo buffer do novo_JPEG
+
 		delay(3); // não acho que seja necessário
 		client.stop();
 
