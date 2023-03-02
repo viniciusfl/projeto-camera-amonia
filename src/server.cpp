@@ -185,7 +185,7 @@ namespace SERVIDOR {
 
 		// store image resolution info.
 		ImageResDetails = String(fb->width) + "x" + String(fb->height);
-
+/*
 		// html to send a jpg
 		const char HEADER[] = "HTTP/1.1 200 OK\r\nAccess-Control-Allow-Origin: *\r\n";
 		const char CTNTTYPE[] = "Content-Type: image/jpeg\r\nContent-Length: ";
@@ -197,7 +197,7 @@ namespace SERVIDOR {
 		client.write(buf, strlen(buf));
 		// send the captured jpg data
 		client.write((char *)fb->buf, fb->len);
-
+*/
 		// AGORA VAMOS CONVERTER A IMAGEM PARA RGB E ANALISAR AS INFORMAÇÕES.
 
 		// Aloca a memória para guardar a imagem RGB: 3 bytes por pixel 
@@ -222,10 +222,29 @@ namespace SERVIDOR {
 			sendText(client,"error: failed to convert image to RGB data");
 			return 0;
 		}
-
-		resultado = processa_imagem(rgb, altura, largura);
 		
 		esp_camera_fb_return(fb);   // camera frame buffer
+
+		resultado = processa_imagem(rgb, altura, largura);
+
+		// Aloca a memória para guardar o novo JPEG 
+		sendText(client,"<br>Free psram before rgb data allocated = " + String(heap_caps_get_free_size(MALLOC_CAP_SPIRAM) / 1024) + "K");
+		void *ptrVal = NULL;                                                                                 // create a pointer for memory location to store the data
+		uint32_t ARRAY_LENGTH = fb->width * fb->height * 3;                                                  // calculate memory required to store the RGB data (i.e. number of pixels in the jpg image x 3)
+		
+		if (heap_caps_get_free_size( MALLOC_CAP_SPIRAM) <  ARRAY_LENGTH) {
+			sendText(client,"error: not enough free psram to store the rgb data");
+			return 0;
+		}
+		ptrVal = heap_caps_malloc(ARRAY_LENGTH, MALLOC_CAP_SPIRAM);                                          // allocate memory space for the rgb data
+		uint8_t *rgb = (uint8_t *)ptrVal;                                                                    // create the 'rgb' array pointer to the allocated memory space
+		sendText(client,"Free psram after rgb data allocated = " + String(heap_caps_get_free_size(MALLOC_CAP_SPIRAM) / 1024) + "K");
+
+	    // Converte a imagem de RGB888 para JPEG                                                                               
+		bool rgb_converted = fmt2jpg(rgb, ARRAY_LENGTH, largura, altura, PIXFORMAT_RGB888, 10, uint8_t ** out, size_t * out_len);
+
+		
+		
 		heap_caps_free(ptrVal);     // rgb data
 		delay(3); // não acho que seja necessário
 		client.stop();
