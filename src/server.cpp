@@ -301,6 +301,7 @@ void handleRoot() {
 	// Exibe para o usuário o estado do sensor
 	sprintf(buffer, "<br> O estado atual do sensor é: %s <br>", resultado.c_str());
 	client.write(buffer);
+	Serial.println(resultado);
 
 	// javascript to refresh the image periodically
 	client.printf(R"=====(

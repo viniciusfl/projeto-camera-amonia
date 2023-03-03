@@ -44,20 +44,24 @@ int hue(double r, double g, double b)
 String mais_proximo_util_2(int i)
 {
     if (i == 0)
-    {
-        return "ALERT";
+    {   
+        //Serial.println("ESQUERDA");
+        return "ALERT (0.05 ppm)";
     }
     else if (i == 1)
     {
-        return "TOXIC";
+        //Serial.println("DIREITA");
+        return "TOXIC (0.5 ppm)";
     }
     else if (i == 2)
     {
-        return "SAFE";
+        //Serial.println("SUPERIOR");
+        return "ALARM (0.2 ppm)";
     }
     else
     {
-        return "ALARM";
+        //Serial.println("INFERIOR");
+        return "SAFE (< 0.02 ppm)";
     }
 }
 
