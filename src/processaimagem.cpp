@@ -1,24 +1,30 @@
 #include <Arduino.h>
 #include "esp_heap_caps.h"
 #include "esp_heap_trace.h"
+#include <math.h>
 
-uint32_t vetoriza(uint32_t x, uint32_t y, int largura) {
-    return x + (y*largura);
+uint32_t vetoriza(uint32_t x, uint32_t y, int largura)
+{
+    return x + (y * largura);
 }
 
-void vals_rgb(uint32_t ponto, uint8_t *rgb, int* array) {
-    array[0] = rgb[3*ponto];
-    array[1] = rgb[(3*ponto) + 1];
-    array[2] = rgb[(3*ponto) + 2];
+void vals_rgb(uint32_t ponto, uint8_t *rgb, int *array)
+{
+    array[0] = rgb[3 * ponto];
+    array[1] = rgb[(3 * ponto) + 1];
+    array[2] = rgb[(3 * ponto) + 2];
     return;
 }
 
-int hue(double r, double g, double b){
-    r = r / 255.0; g = g / 255.0; b = b / 255.0;
+int hue(double r, double g, double b)
+{
+    r = r / 255.0;
+    g = g / 255.0;
+    b = b / 255.0;
 
     double cmax = max(r, max(g, b)); // maximum of r, g, b
     double cmin = min(r, min(g, b)); // minimum of r, g, b
-    double diff = cmax - cmin; // diff of cmax and cmin.
+    double diff = cmax - cmin;       // diff of cmax and cmin.
     double h = -1;
 
     if (cmax == cmin)
@@ -35,29 +41,36 @@ int hue(double r, double g, double b){
     return h;
 }
 
-String mais_proximo_util_2(int i){
-	if(i == 0){
+String mais_proximo_util_2(int i)
+{
+    if (i == 0)
+    {
         return "ALERT";
-	}  
-    else if(i == 1){
-		return "TOXIC";
-	}   
-    else if(i == 2){
+    }
+    else if (i == 1)
+    {
+        return "TOXIC";
+    }
+    else if (i == 2)
+    {
         return "SAFE";
-	}
-    else{ 
+    }
+    else
+    {
         return "ALARM";
-	}
+    }
 }
 
-
-String mais_proximo_util(double valor, double* lista) {
+String mais_proximo_util(double valor, double *lista)
+{
     double min = INT_MAX;
     int index = 0;
 
-    for(int i = 0; i < 4; i++){
-        if(abs(((int) valor) - ((int) lista[i])) < min){
-            min = abs(((int) valor) - ((int) lista[i]));
+    for (int i = 0; i < 4; i++)
+    {
+        if (abs(((int)valor) - ((int)lista[i])) < min)
+        {
+            min = abs(((int)valor) - ((int)lista[i]));
             index = i;
         }
     }
@@ -65,11 +78,90 @@ String mais_proximo_util(double valor, double* lista) {
     return mais_proximo_util_2(index);
 }
 
-void faz_quadrado(uint8_t *rgb, uint32_t x, uint32_t y, int k, int largura){
-    for(int i = (x-k); i < (x+k+1); i++){
-        for(int j = (y-k); j < (y+k+1); j++){
-            if((i!=x) || (j!=y)){
-                uint32_t pos = vetoriza(i, j, largura);
+void yLine(uint8_t *rgb, uint32_t x, uint32_t y1, uint32_t y2, int largura){
+    while (y1 <= y2){
+        uint32_t pos = vetoriza(x, y1, largura);
+        // pinta de vermelho
+        rgb[3*pos] = 0;        // B
+        rgb[3*pos + 1] = 0;    // G
+        rgb[3*pos + 2] = 255;  // R
+        y1++;
+    }
+}
+
+void xLine(uint8_t *rgb, uint32_t x1, uint32_t x2, uint32_t y, int largura){
+    while (x1 <= x2){
+        uint32_t pos = vetoriza(x1, y, largura);
+        // pinta de vermelho
+        rgb[3*pos] = 0;        // B
+        rgb[3*pos + 1] = 0;    // G
+        rgb[3*pos + 2] = 255;  // R
+        x1++;
+    }
+}
+
+void faz_circulo(uint8_t *rgb, uint32_t xc, uint32_t yc, int r, int grossura, int largura){
+
+
+    //ro = thick - 1 + r
+
+    int xo = grossura + r - 1;
+    int xi = r;
+    int y = 0;
+    int erro = 1 - xo;
+    int erri = 1 - xi;
+
+    while(xo >= y) {
+        xLine(rgb, xc + xi, xc + xo, yc + y, largura);
+        yLine(rgb, xc + y,  yc + xi, yc + xo, largura);
+        xLine(rgb, xc - xo, xc - xi, yc + y, largura);
+        yLine(rgb, xc - y,  yc + xi, yc + xo, largura);
+        xLine(rgb, xc - xo, xc - xi, yc - y, largura);
+        yLine(rgb, xc - y,  yc - xo, yc - xi, largura);
+        xLine(rgb, xc + xi, xc + xo, yc - y, largura);
+        yLine(rgb, xc + y,  yc - xo, yc - xi, largura);
+
+        y++;
+
+        if (erro < 0) {
+            erro += 2 * y + 1;
+        } else {
+            xo--;
+            erro += 2 * (y - xo + 1);
+        }
+
+        if (y > r) {
+            xi = y;
+        } else {
+            if (erri < 0) {
+                erri += 2 * y + 1;
+            } else {
+                xi--;
+                erri += 2 * (y - xi + 1);
+            }
+        }
+    }
+}
+
+
+
+
+void faz_circulo2(uint8_t *rgb, uint32_t x, uint32_t y, int r, int grossura, int largura){
+
+    double angle, x1, y1;
+
+    for (double i = 0; i < 360; i += 0.1){
+        angle = i;
+        x1 = r * cos(angle * M_PI / 180.);
+        y1 = r * sin(angle * M_PI / 180.);
+        uint32_t pos = vetoriza(x+x1, y+y1, largura);
+        // pinta de vermelho
+        rgb[3*pos] = 0;        // B
+        rgb[3*pos + 1] = 0;    // G
+        rgb[3*pos + 2] = 255;  // R
+        if(grossura > 1){
+            for(int k = 1; k < grossura;  k++){
+                uint32_t aux_pos = vetoriza(x+x1+k, y+y1, largura);
                 // pinta de vermelho
                 rgb[3*pos] = 0;        // B
                 rgb[3*pos + 1] = 0;    // G
@@ -79,53 +171,8 @@ void faz_quadrado(uint8_t *rgb, uint32_t x, uint32_t y, int k, int largura){
     }
 }
 
-String processa_imagem(uint8_t *rgb, uint32_t pontos[][2], int altura, int largura) {
-/*  uint32_t ponto_esquerdo_x = (uint32_t)(1 / 4. * largura);
-    uint32_t ponto_esquerdo_y = (uint32_t)(1 / 2. * altura);
-
-
-    uint32_t ponto_direito_x = (uint32_t)(3 / 4. * largura);
-    uint32_t ponto_direito_y = (uint32_t)(1 / 2. * altura);
-
-
-    uint32_t ponto_superior_x = (uint32_t)(1 / 2. * largura);
-    uint32_t ponto_superior_y = (uint32_t)(1 / 4. * altura);
-    
-
-    uint32_t ponto_inferior_x = (uint32_t)(1 / 2. * largura);
-    uint32_t ponto_inferior_y = (uint32_t)(3 / 4. * altura);
-    
-
-    uint32_t ponto_central_x = (uint32_t)(1 / 2. * largura);
-    uint32_t ponto_central_y = (uint32_t)(1 / 2. * altura);
-*/
-/*
-    Serial.print("Coordenadas ponto esquerdo: ");
-    Serial.print("(");
-    Serial.print(ponto_esquerdo_x); Serial.print(","); Serial.print(ponto_esquerdo_y); 
-    Serial.println(")");
-
-    Serial.print("Coordenadas ponto direito: ");
-    Serial.print("(");
-    Serial.print(ponto_direito_x); Serial.print(","); Serial.print(ponto_direito_y); 
-    Serial.println(")");
-    
-    Serial.print("Coordenadas ponto superior: ");
-    Serial.print("(");
-    Serial.print(ponto_superior_x); Serial.print(","); Serial.print(ponto_superior_y); 
-    Serial.println(")");
-
-    Serial.print("Coordenadas ponto inferior: ");
-    Serial.print("(");
-    Serial.print(ponto_inferior_x); Serial.print(","); Serial.print(ponto_inferior_y); 
-    Serial.println(")");
-
-    Serial.print("Coordenadas ponto central: ");
-    Serial.print("(");
-    Serial.print(ponto_central_x); Serial.print(","); Serial.print(ponto_central_y); 
-    Serial.println(")");
-
-*/    
+String processa_imagem(uint8_t *rgb, uint32_t pontos[][2], int altura, int largura)
+{
 
     uint32_t ponto_esquerdo_vetorizado = vetoriza(pontos[0][0], pontos[0][1], largura);
     uint32_t ponto_direito_vetorizado = vetoriza(pontos[1][0], pontos[1][1], largura);
@@ -133,39 +180,21 @@ String processa_imagem(uint8_t *rgb, uint32_t pontos[][2], int altura, int largu
     uint32_t ponto_inferior_vetorizado = vetoriza(pontos[3][0], pontos[3][1], largura);
     uint32_t ponto_central_vetorizado = vetoriza(pontos[4][0], pontos[4][1], largura);
 
-/*
-    Serial.print("esquerdo vetorizado = ");
-    Serial.println(ponto_esquerdo_vetorizado);
-
-    Serial.print("direito vetorizado = ");
-    Serial.println(ponto_direito_vetorizado);
-
-    Serial.print("superior vetorizado = ");
-    Serial.println(ponto_superior_vetorizado);
-
-    Serial.print("inferior vetorizado = ");
-    Serial.println(ponto_inferior_vetorizado);
-
-    Serial.print("central vetorizado = ");
-    Serial.println(ponto_central_vetorizado);
-*/
-
     int esquerdo[3];
     vals_rgb(ponto_esquerdo_vetorizado, rgb, esquerdo);
-    
+
     int direito[3];
     vals_rgb(ponto_direito_vetorizado, rgb, direito);
-    
+
     int superior[3];
     vals_rgb(ponto_superior_vetorizado, rgb, superior);
-    
+
     int inferior[3];
     vals_rgb(ponto_inferior_vetorizado, rgb, inferior);
-    
+
     int centro[3];
     vals_rgb(ponto_central_vetorizado, rgb, centro);
 
-    
     double hues[4];
     hues[0] = hue(esquerdo[0], esquerdo[1], esquerdo[2]);
     hues[1] = hue(direito[0], direito[1], direito[2]);
@@ -173,6 +202,5 @@ String processa_imagem(uint8_t *rgb, uint32_t pontos[][2], int altura, int largu
     hues[3] = hue(inferior[0], inferior[1], inferior[2]);
     double hue_centro = hue(centro[0], centro[1], centro[2]);
 
-    
     return mais_proximo_util(hue_centro, hues);
 }

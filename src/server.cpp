@@ -35,7 +35,6 @@ namespace SERVIDOR {
 	uint32_t largura = 640;
 	uint32_t altura = 480;
 
-	#define LARGURA_DESTAQUE 20
 	
 	#define PIXFORMAT PIXFORMAT_JPEG;                    // image format, Options =  YUV422, GRAYSCALE, RGB565, JPEG, RGB888
 
@@ -188,19 +187,6 @@ namespace SERVIDOR {
 
 		// store image resolution info.
 		ImageResDetails = String(fb->width) + "x" + String(fb->height);
-/*
-		// html to send a jpg
-		const char HEADER[] = "HTTP/1.1 200 OK\r\nAccess-Control-Allow-Origin: *\r\n";
-		const char CTNTTYPE[] = "Content-Type: image/jpeg\r\nContent-Length: ";
-		const int hdrLen = strlen(HEADER);
-		const int cntLen = strlen(CTNTTYPE);
-		client.write(HEADER, hdrLen);
-		client.write(CTNTTYPE, cntLen);
-		sprintf( buf, "%d\r\n\r\n", fb->len);      // put text size in to 'buf' char array and send
-		client.write(buf, strlen(buf));
-		// send the captured jpg data
-		client.write((char *)fb->buf, fb->len);
-*/
 		
 		// AGORA VAMOS CONVERTER A IMAGEM PARA RGB E ANALISAR AS INFORMAÇÕES.
 
@@ -239,18 +225,21 @@ namespace SERVIDOR {
 		*/
 
 
-		uint32_t pontos[5][2] = {{(uint32_t)(1 / 4. * largura), (uint32_t)(1 / 2. * altura)}, 
-								 {(uint32_t)(3 / 4. * largura), (uint32_t)(1 / 2. * altura)}, 
-								 {(uint32_t)(1 / 2. * largura), (uint32_t)(1 / 4. * altura)}, 
-								 {(uint32_t)(1 / 2. * largura), (uint32_t)(3 / 4. * altura)}, 
-								 {(uint32_t)(1 / 2. * largura), (uint32_t)(1 / 2. * altura)}};
+		uint32_t pontos[5][2] = {{(uint32_t)(1 / 4. * fb->width), (uint32_t)(1 / 2. * fb->height)}, 
+								 {(uint32_t)(3 / 4. * fb->width), (uint32_t)(1 / 2. * fb->height)}, 
+								 {(uint32_t)(1 / 2. * fb->width), (uint32_t)(1 / 4. * fb->height)}, 
+								 {(uint32_t)(1 / 2. * fb->width), (uint32_t)(3 / 4. * fb->height)}, 
+								 {(uint32_t)(1 / 2. * fb->width), (uint32_t)(1 / 2. * fb->height)}};
 
 
 
-		resultado = processa_imagem(rgb, pontos, altura, largura);
+		resultado = processa_imagem(rgb, pontos, altura, fb->width);
+
+		int raio = 5;
+		int grossura = 3;
 
 		for(int i = 0; i < 5; i++){
-			faz_quadrado(rgb, pontos[i][0], pontos[i][1], LARGURA_DESTAQUE, largura);
+			faz_circulo(rgb, pontos[i][0], pontos[i][1], raio, grossura, fb->width);
 		}
 
 
