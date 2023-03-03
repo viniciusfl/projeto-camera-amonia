@@ -233,7 +233,7 @@ namespace SERVIDOR {
 
 
 
-		resultado = processa_imagem(rgb, pontos, altura, fb->width);
+		resultado = processa_imagem(rgb, pontos, fb->height, fb->width);
 
 		int raio = 5;
 		int grossura = 3;
