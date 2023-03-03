@@ -1,4 +1,6 @@
 - Colocar horário indicando quando a foto que está sendo analisada foi tirada.
 - Testar se o resultado da função processa_imagem() está certo.
+    - Imprimir no terminal as Coordenadas dos pontos
+    - Imprimir no terminal os dados observados.
 - Jogar o servidor local na web.
 - Pensar e trabalhar em questões de usabilidade.
