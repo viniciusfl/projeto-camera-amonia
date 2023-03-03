@@ -2,6 +2,7 @@
 #include <WebServer.h>
 #include <processaimagem.h>
 #include "esp_camera.h"
+#include "dl_lib.h"
 #include "esp_heap_caps.h"
 #include "esp_heap_trace.h"
 
@@ -34,7 +35,7 @@ namespace SERVIDOR {
 	uint32_t largura = 640;
 	uint32_t altura = 480;
 
-	#define LARGURA_DESTAQUE 2;
+	#define LARGURA_DESTAQUE 20
 	
 	#define PIXFORMAT PIXFORMAT_JPEG;                    // image format, Options =  YUV422, GRAYSCALE, RGB565, JPEG, RGB888
 
@@ -200,10 +201,11 @@ namespace SERVIDOR {
 		// send the captured jpg data
 		client.write((char *)fb->buf, fb->len);
 */
+		
 		// AGORA VAMOS CONVERTER A IMAGEM PARA RGB E ANALISAR AS INFORMAÇÕES.
 
 		// Aloca a memória para guardar a imagem RGB: 3 bytes por pixel 
-		sendText(client,"<br>Free psram before rgb data allocated = " + String(heap_caps_get_free_size(MALLOC_CAP_SPIRAM) / 1024) + "K");
+		//sendText(client,"<br>Free psram before rgb data allocated = " + String(heap_caps_get_free_size(MALLOC_CAP_SPIRAM) / 1024) + "K");
 		void *ptrVal = NULL;                                                                                 // create a pointer for memory location to store the data
 		uint32_t ARRAY_LENGTH = fb->width * fb->height * 3;                                                  // calculate memory required to store the RGB data (i.e. number of pixels in the jpg image x 3)
 		
@@ -213,7 +215,7 @@ namespace SERVIDOR {
 		}
 		ptrVal = heap_caps_malloc(ARRAY_LENGTH, MALLOC_CAP_SPIRAM);                                          // allocate memory space for the rgb data
 		uint8_t *rgb = (uint8_t *)ptrVal;                                                                    // create the 'rgb' array pointer to the allocated memory space
-		sendText(client,"Free psram after rgb data allocated = " + String(heap_caps_get_free_size(MALLOC_CAP_SPIRAM) / 1024) + "K");
+		//sendText(client,"Free psram after rgb data allocated = " + String(heap_caps_get_free_size(MALLOC_CAP_SPIRAM) / 1024) + "K");
 
 	    // Converte a imagem de jpeg para RGB                                                                               
 		bool jpeg_converted = fmt2rgb888(fb->buf, fb->len, PIXFORMAT_JPEG, rgb);
@@ -225,7 +227,8 @@ namespace SERVIDOR {
 			return 0;
 		}
 		
-		esp_camera_fb_return(fb);   // libera a memória utilizada pelo frame buffer
+
+
 
 		/*
 		{{ponto_esquerdo_x, ponto_esquerdo_y},
@@ -244,35 +247,35 @@ namespace SERVIDOR {
 
 
 
-
 		resultado = processa_imagem(rgb, pontos, altura, largura);
 
 		for(int i = 0; i < 5; i++){
 			faz_quadrado(rgb, pontos[i][0], pontos[i][1], LARGURA_DESTAQUE, largura);
 		}
 
+
 	    // Converte a imagem de RGB888 para JPEG 
-		uint8_t** novo_JPEG = NULL;     // Pointer to be populated with the address of the resulting buffer.
-		size_t * novo_JPEG_BUFF_LENGTH = NULL;   // Pointer to be populated with the length of the output buffer
+		uint8_t* novo_JPEG = NULL;     // Pointer to be populated with the address of the resulting buffer.
+		size_t novo_JPEG_BUFF_LENGTH = 0;   // Pointer to be populated with the length of the output buffer
 		                                                                           
-		bool rgb_converted = fmt2jpg(rgb, ARRAY_LENGTH, largura, altura, PIXFORMAT_RGB888, 10, novo_JPEG, novo_JPEG_BUFF_LENGTH);
+		bool rgb_converted = fmt2jpg(rgb, ARRAY_LENGTH, fb->width, fb->height, PIXFORMAT_RGB888, 90, &novo_JPEG, &novo_JPEG_BUFF_LENGTH);
 
-		heap_caps_free(ptrVal);     // libera memória utilizada pelo buffer rgb
-
+		
 
 		// html to send a jpg
 		const char HEADER[] = "HTTP/1.1 200 OK\r\nAccess-Control-Allow-Origin: *\r\n";
 		const char CTNTTYPE[] = "Content-Type: image/jpeg\r\nContent-Length: ";
 		const int hdrLen = strlen(HEADER);
 		const int cntLen = strlen(CTNTTYPE);
-		client.write(HEADER, hdrLen);
-		client.write(CTNTTYPE, cntLen);
 		sprintf( buf, "%d\r\n\r\n", fb->len);      // put text size in to 'buf' char array and send
-		client.write(buf, strlen(buf));
-		// send the captured jpg data
 		client.write((char *)novo_JPEG, novo_JPEG_BUFF_LENGTH);
 
+
 		heap_caps_free(novo_JPEG);     // libera memória utilizada pelo buffer do novo_JPEG
+		
+		esp_camera_fb_return(fb);   // libera a memória utilizada pelo frame buffer
+
+		heap_caps_free(ptrVal);     // libera memória utilizada pelo buffer rgb
 
 		delay(3); // não acho que seja necessário
 		client.stop();

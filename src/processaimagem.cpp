@@ -79,7 +79,7 @@ void faz_quadrado(uint8_t *rgb, uint32_t x, uint32_t y, int k, int largura){
     }
 }
 
-String processa_imagem(uint8_t *rgb, uint32_t **pontos, int altura, int largura) {
+String processa_imagem(uint8_t *rgb, uint32_t pontos[][2], int altura, int largura) {
 /*  uint32_t ponto_esquerdo_x = (uint32_t)(1 / 4. * largura);
     uint32_t ponto_esquerdo_y = (uint32_t)(1 / 2. * altura);
 
