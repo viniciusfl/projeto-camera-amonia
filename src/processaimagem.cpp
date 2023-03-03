@@ -144,33 +144,6 @@ void faz_circulo(uint8_t *rgb, uint32_t xc, uint32_t yc, int r, int grossura, in
 }
 
 
-
-
-void faz_circulo2(uint8_t *rgb, uint32_t x, uint32_t y, int r, int grossura, int largura){
-
-    double angle, x1, y1;
-
-    for (double i = 0; i < 360; i += 0.1){
-        angle = i;
-        x1 = r * cos(angle * M_PI / 180.);
-        y1 = r * sin(angle * M_PI / 180.);
-        uint32_t pos = vetoriza(x+x1, y+y1, largura);
-        // pinta de vermelho
-        rgb[3*pos] = 0;        // B
-        rgb[3*pos + 1] = 0;    // G
-        rgb[3*pos + 2] = 255;  // R
-        if(grossura > 1){
-            for(int k = 1; k < grossura;  k++){
-                uint32_t aux_pos = vetoriza(x+x1+k, y+y1, largura);
-                // pinta de vermelho
-                rgb[3*pos] = 0;        // B
-                rgb[3*pos + 1] = 0;    // G
-                rgb[3*pos + 2] = 255;  // R
-            }
-        }
-    }
-}
-
 String processa_imagem(uint8_t *rgb, uint32_t pontos[][2], int altura, int largura)
 {
 
