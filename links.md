@@ -1,4 +1,6 @@
 # Registro de links úteis
+Programação da esp32cam utilizando o arduino UNO
+- https://www.youtube.com/watch?v=q-KIpFIbRMk
 
 Processamento de imagens no esp32:
 - https://github.com/alanesq/esp32cam-demo    (PRINCIPAL)
