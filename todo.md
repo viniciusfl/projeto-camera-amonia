@@ -1,3 +1,4 @@
 - Colocar horário indicando quando a foto que está sendo analisada foi tirada.
-- Jogar o servidor local na web.
+- Criar servidor NodeJS que comporte as informações do projeto
+- Fazer deploy da aplicação Node na AWS.
 - Pensar e trabalhar em questões de usabilidade.
