@@ -13,7 +13,6 @@ void setup() {
     delay(100);
 
     millisAtual = millis();
-
     iniciaWifi();
     iniciaServidor();
 }

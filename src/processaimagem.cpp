@@ -107,7 +107,7 @@ void xLine(uint8_t *rgb, uint32_t x1, uint32_t x2, uint32_t y, int largura){
 void faz_circulo(uint8_t *rgb, uint32_t xc, uint32_t yc, int r, int grossura, int largura){
 
 
-    //ro = thick - 1 + r
+    //ro = thickness - 1 + r
 
     int xo = grossura + r - 1;
     int xi = r;
